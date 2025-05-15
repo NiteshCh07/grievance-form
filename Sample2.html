@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Grievance Form</title>
+
+  <!-- Emoji Picker -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #d9afd9, #97d9e1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .form-container {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      max-width: 420px;
+      width: 100%;
+    }
+
+    h2 {
+      margin-top: 0;
+      text-align: center;
+      color: #333;
+    }
+
+    input, textarea {
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      resize: none;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      font-size: 18px;
+      border: none;
+      background-color: #6a11cb;
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #5311a5;
+    }
+
+    .emoji-display {
+      margin-top: 10px;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      .form-container {
+        padding: 20px;
+        border-radius: 15px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      input, textarea, button {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Share What's Bothering You</h2>
+    <input type="text" id="title" placeholder="Title" autocomplete="off" required />
+    <textarea id="message" rows="5" placeholder="What's bothering you?" required></textarea>
+
+    <p>Pick an emoji that reflects your mood:</p>
+    <emoji-picker id="emojiPicker"></emoji-picker>
+
+    <!-- Show the selected emoji -->
+    <div class="emoji-display" id="selectedEmojiDisplay"></div>
+
+    <button id="submitBtn">Send</button>
+  </div>
+
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+  <!-- Logic -->
+  <script>
+    // TODO: Replace with your actual EmailJS credentials
+    const EMAILJS_PUBLIC_KEY = "xtnWTvSgmJZ9wz_-_";
+    const EMAILJS_SERVICE_ID = "service_dcl6lf9";
+    const EMAILJS_TEMPLATE_ID = "template_o0zz5d8";
+
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+
+    let selectedEmoji = "";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const picker = document.getElementById("emojiPicker");
+      const emojiDisplay = document.getElementById("selectedEmojiDisplay");
+
+      picker.addEventListener("emoji-click", (event) => {
+        selectedEmoji = event.detail.unicode;
+        emojiDisplay.textContent = `Selected Emoji: ${selectedEmoji}`;
+      });
+
+      document.getElementById("submitBtn").addEventListener("click", () => {
+        const title = document.getElementById("title").value.trim();
+        const message = document.getElementById("message").value.trim();
+
+        if (!title || !message) {
+          alert("Please fill in both title and message.");
+          return;
+        }
+
+        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          title: title,
+          message: message,
+          emoji: selectedEmoji || "None selected",
+		  email: "nitesh2.chaurasia@gmail.com"
+		  
+        })
+        .then(() => {
+          alert("Grievance sent successfully!");
+          document.getElementById("title").value = "";
+          document.getElementById("message").value = "";
+          emojiDisplay.textContent = "";
+          selectedEmoji = "";
+        })
+        .catch((error) => {
+          alert("Error sending grievance: " + JSON.stringify(error));
+        });
+      });
+    });
+  </script>
+</body>
+</html>
